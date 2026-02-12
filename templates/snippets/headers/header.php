@@ -133,8 +133,16 @@ $social_media_style = get_theme_mod( 'minimalio_settings_social_media_style' );
 
 		<?php
 		$header_extra_text = get_theme_mod( 'minimalio_settings_header_extra_text' );
-		if ( $header_extra_text && get_theme_mod( 'minimalio_settings_header_variation' ) === 'vertical' ) : ?>
-			<div class="header__extra-text mt-4" style="display:none;">
+		if ( $header_extra_text && get_theme_mod( 'minimalio_settings_header_variation' ) === 'vertical' ) :
+			$extra_font_size = get_theme_mod( 'minimalio_settings_header_extra_text_font_size', '14px' );
+			$extra_font      = get_theme_mod( 'minimalio_settings_header_extra_text_font', 'inherit' );
+			$extra_style     = 'display:none; font-size:' . esc_attr( $extra_font_size ) . ';';
+			if ( $extra_font && $extra_font !== 'inherit' ) {
+				$extra_font_name = function_exists( 'oneguy_get_font_family_name' ) ? oneguy_get_font_family_name( $extra_font ) : $extra_font;
+				$extra_style    .= ' font-family:' . esc_attr( str_replace( '+', ' ', $extra_font_name ) ) . ', sans-serif;';
+			}
+		?>
+			<div class="header__extra-text mt-4" style="<?php echo $extra_style; ?>">
 				<?php echo wp_kses_post( $header_extra_text ); ?>
 			</div>
 			<script>

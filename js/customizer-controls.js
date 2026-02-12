@@ -60,19 +60,36 @@
 			});
 		});
 
-		// Only show header extra text when vertical header is selected
+		// Only show header extra text controls when vertical header is selected
 		wp.customize('minimalio_settings_header_variation', function (setting) {
-			wp.customize.control('minimalio_header_options_header_extra_text', function (control) {
-				var visibility = function () {
-					if ('vertical' === setting.get()) {
-						control.container.slideDown(180);
-					} else {
-						control.container.slideUp(180);
-					}
-				};
+			var extraTextControls = [
+				'minimalio_header_options_header_extra_text',
+				'minimalio_header_options_header_extra_text_font_size',
+				'minimalio_header_options_header_extra_text_font'
+			];
 
-				visibility();
-				setting.bind(visibility);
+			extraTextControls.forEach(function (controlId) {
+				wp.customize.control(controlId, function (control) {
+					var visibility = function () {
+						if ('vertical' === setting.get()) {
+							control.container.slideDown(180);
+						} else {
+							control.container.slideUp(180);
+						}
+					};
+
+					visibility();
+					setting.bind(visibility);
+				});
+			});
+		});
+
+		// Disable divider options in the extra text font dropdown
+		wp.customize.control('minimalio_header_options_header_extra_text_font', function (control) {
+			control.container.find('select option').each(function () {
+				if (this.value.indexOf('---') === 0) {
+					this.disabled = true;
+				}
 			});
 		});
 

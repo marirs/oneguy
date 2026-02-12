@@ -123,6 +123,42 @@ function oneguy_content_width_js() {
 add_action( 'wp_enqueue_scripts', 'oneguy_content_width_js' );
 
 /**
+ * Load Google font for header extra text if needed
+ */
+function oneguy_load_extra_text_font() {
+	$extra_font = get_theme_mod( 'minimalio_settings_header_extra_text_font', 'inherit' );
+	if ( ! $extra_font || $extra_font === 'inherit' ) {
+		return;
+	}
+
+	// Skip custom fonts and simple fonts (they have their own @font-face)
+	if ( strpos( $extra_font, 'custom_' ) === 0 || strpos( $extra_font, 'simple_' ) === 0 ) {
+		return;
+	}
+
+	// Skip web-safe fonts
+	$safe_fonts = [ 'Arial', 'Verdana', 'Tahoma', 'Times+New+Roman', 'Georgia', 'Garamond', 'Courier+New', 'Brush+Script+MT' ];
+	if ( in_array( $extra_font, $safe_fonts, true ) ) {
+		return;
+	}
+
+	// Skip if same as body font (already loaded by parent)
+	$body_font = get_theme_mod( 'minimalio_typography_settings_google_font' );
+	if ( $extra_font === $body_font ) {
+		return;
+	}
+
+	// Load from Google Fonts
+	wp_enqueue_style(
+		'oneguy-extra-text-font',
+		'https://fonts.googleapis.com/css2?family=' . esc_attr( $extra_font ) . ':wght@400;700&display=swap',
+		[],
+		null
+	);
+}
+add_action( 'wp_enqueue_scripts', 'oneguy_load_extra_text_font' );
+
+/**
  * Add additional dynamic CSS for child theme customizer options
  */
 function oneguy_dynamic_css() {
@@ -385,6 +421,18 @@ function oneguy_customize_register( $customizer ) {
 		'transport'         => 'refresh',
 	]);
 
+	$customizer->add_setting( 'minimalio_settings_header_extra_text_font_size', [
+		'default'           => '14px',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_setting( 'minimalio_settings_header_extra_text_font', [
+		'default'           => 'inherit',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
 	$customizer->add_control(
 		new WP_Customize_Control(
 			$customizer,
@@ -395,6 +443,51 @@ function oneguy_customize_register( $customizer ) {
 				'section'     => 'minimalio_heading_settings_fixed',
 				'settings'    => 'minimalio_settings_header_extra_text',
 				'type'        => 'textarea',
+			]
+		)
+	);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_header_options_header_extra_text_font_size',
+			[
+				'label'    => esc_html__( 'Extra Text Font Size', 'oneguy' ),
+				'section'  => 'minimalio_heading_settings_fixed',
+				'settings' => 'minimalio_settings_header_extra_text_font_size',
+				'type'     => 'select',
+				'choices'  => [
+					'10px' => esc_html__( '10px - Tiny', 'oneguy' ),
+					'11px' => esc_html__( '11px - Smaller', 'oneguy' ),
+					'12px' => esc_html__( '12px - Small', 'oneguy' ),
+					'13px' => esc_html__( '13px', 'oneguy' ),
+					'14px' => esc_html__( '14px - Default', 'oneguy' ),
+					'15px' => esc_html__( '15px', 'oneguy' ),
+					'16px' => esc_html__( '16px - Normal', 'oneguy' ),
+					'18px' => esc_html__( '18px - Medium', 'oneguy' ),
+					'20px' => esc_html__( '20px - Large', 'oneguy' ),
+					'24px' => esc_html__( '24px - Larger', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	// Build font choices for extra text (same fonts as main font dropdown)
+	$extra_text_font_choices = [ 'inherit' => esc_html__( 'Inherit (Same as body)', 'oneguy' ) ];
+	if ( $font_control ) {
+		$extra_text_font_choices = array_merge( $extra_text_font_choices, $font_control->choices );
+	}
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_header_options_header_extra_text_font',
+			[
+				'label'    => esc_html__( 'Extra Text Font', 'oneguy' ),
+				'section'  => 'minimalio_heading_settings_fixed',
+				'settings' => 'minimalio_settings_header_extra_text_font',
+				'type'     => 'select',
+				'choices'  => $extra_text_font_choices,
 			]
 		)
 	);
