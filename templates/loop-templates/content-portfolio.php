@@ -28,7 +28,7 @@ $show_share = get_theme_mod( 'minimalio_settings_single_portfolio_share' ) === '
 			</div>
 		<?php endif; ?>
 
-		<?php $titleAlign = get_theme_mod( 'minimalio_settings_single_portfolio_title_align', 'justify-center' ) ?>
+		<?php $titleAlign = get_theme_mod( 'minimalio_settings_single_portfolio_title_align', 'justify-center' ); ?>
 		<?php if ( $show_title ) :
 			$titleSize = get_theme_mod( 'minimalio_settings_single_portfolio_title_size', 'h2' );
 		?>
@@ -132,6 +132,12 @@ $show_share = get_theme_mod( 'minimalio_settings_single_portfolio_share' ) === '
 		);
 		?>
 	</div><!-- .entry-content -->
+
+	<?php if ( get_theme_mod( 'minimalio_settings_single_portfolio_comments' ) === 'yes' ) : ?>
+		<?php if ( comments_open() || get_comments_number() ) : ?>
+			<?php comments_template(); ?>
+		<?php endif; ?>
+	<?php endif; ?>
 
 	<?php if ( get_theme_mod( 'minimalio_settings_single_portfolio_latest' ) === 'yes' ) : ?>
 		<div class="mt-12 latest-posts">

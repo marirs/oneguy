@@ -159,6 +159,30 @@ function oneguy_load_extra_text_font() {
 add_action( 'wp_enqueue_scripts', 'oneguy_load_extra_text_font' );
 
 /**
+ * Custom comment form title for portfolio posts
+ */
+function oneguy_portfolio_comment_form_title( $defaults ) {
+	if ( is_singular( 'portfolio' ) ) {
+		$custom_title = get_theme_mod( 'minimalio_settings_single_portfolio_comments_title' );
+		if ( $custom_title ) {
+			$defaults['title_reply'] = esc_html( $custom_title );
+		}
+	}
+	return $defaults;
+}
+add_filter( 'comment_form_defaults', 'oneguy_portfolio_comment_form_title' );
+
+/**
+ * Add comment support to portfolio post type when enabled
+ */
+function oneguy_portfolio_comment_support() {
+	if ( get_theme_mod( 'minimalio_settings_single_portfolio_comments', 'no' ) === 'yes' ) {
+		add_post_type_support( 'portfolio', 'comments' );
+	}
+}
+add_action( 'init', 'oneguy_portfolio_comment_support' );
+
+/**
  * Add additional dynamic CSS for child theme customizer options
  */
 function oneguy_dynamic_css() {
@@ -250,6 +274,16 @@ function oneguy_dynamic_css() {
 			margin: 0 !important;
 			width: 100% !important;
 		}';
+	}
+
+	// Portfolio comment title colors
+	$comment_title_color = get_theme_mod( 'minimalio_settings_single_portfolio_comments_title_color' );
+	if ( $comment_title_color ) {
+		$css .= sprintf( '.single-portfolio .comment-reply-title { color: %s; } ', esc_attr( $comment_title_color ) );
+	}
+	$comment_reply_color = get_theme_mod( 'minimalio_settings_single_portfolio_comments_reply_color' );
+	if ( $comment_reply_color ) {
+		$css .= sprintf( '.single-portfolio .comments-title { color: %s; } ', esc_attr( $comment_reply_color ) );
 	}
 
 	// Social media brand colors
@@ -664,6 +698,89 @@ function oneguy_customize_register( $customizer ) {
 					'constrained' => esc_html__( 'Constrained', 'oneguy' ),
 					'full'        => esc_html__( 'Full-Width Gutenberg (Default)', 'oneguy' ),
 				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Portfolio Options: Comments
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_single_portfolio_comments', [
+		'default'           => 'no',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_single_portfolio_comments',
+			[
+				'label'    => esc_html__( 'Show and Allow Comments', 'oneguy' ),
+				'section'  => 'minimalio_portfolio_options',
+				'settings' => 'minimalio_settings_single_portfolio_comments',
+				'type'     => 'select',
+				'choices'  => [
+					'no'  => esc_html__( 'No', 'oneguy' ),
+					'yes' => esc_html__( 'Yes', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_single_portfolio_comments_title', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_single_portfolio_comments_title',
+			[
+				'label'       => esc_html__( 'Comment Form Title', 'oneguy' ),
+				'description' => esc_html__( 'Leave empty for default "Leave a Reply".', 'oneguy' ),
+				'section'     => 'minimalio_portfolio_options',
+				'settings'    => 'minimalio_settings_single_portfolio_comments_title',
+				'type'        => 'text',
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_single_portfolio_comments_title_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_single_portfolio_comments_title_color',
+			[
+				'label'    => esc_html__( '"Leave a Reply" Title Color', 'oneguy' ),
+				'section'  => 'minimalio_portfolio_options',
+				'settings' => 'minimalio_settings_single_portfolio_comments_title_color',
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_single_portfolio_comments_reply_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_single_portfolio_comments_reply_color',
+			[
+				'label'    => esc_html__( 'Replies Title Color', 'oneguy' ),
+				'section'  => 'minimalio_portfolio_options',
+				'settings' => 'minimalio_settings_single_portfolio_comments_reply_color',
 			]
 		)
 	);
