@@ -176,7 +176,7 @@ function oneguy_dynamic_css() {
 		$css .= sprintf( '.single-post .entry-content, .blog-post-type .post-card__excerpt {text-align: %s } ', esc_attr( $blog_text_align ) );
 	}
 
-	// Content width behavior
+	// Content width behavior (blog)
 	$content_width_behavior = get_theme_mod( 'minimalio_settings_content_width_behavior' );
 	if ( $content_width_behavior === 'constrained' ) {
 		$css .= '.single-post .single-post__thumbnail {
@@ -212,6 +212,97 @@ function oneguy_dynamic_css() {
 			margin: 0 !important;
 			width: 100% !important;
 		}';
+	}
+
+	// Content width behavior (portfolio)
+	$portfolio_width_behavior = get_theme_mod( 'minimalio_settings_portfolio_content_width_behavior' );
+	if ( $portfolio_width_behavior === 'constrained' ) {
+		$css .= '.single-portfolio .single-post__thumbnail {
+			max-width: 1240px !important;
+			margin: 0 0 2rem 0 !important;
+			width: 100% !important;
+			left: auto !important;
+			right: auto !important;
+			transform: none !important;
+			position: relative !important;
+		}
+		.single-portfolio .single-post__content {
+			max-width: 1240px !important;
+			margin: 0 !important;
+			width: 100% !important;
+		}
+		.single-portfolio .entry-content > .alignfull,
+		.single-portfolio .entry-content > .alignfull[style] {
+			max-width: 1240px !important;
+			margin: 0 !important;
+			width: 100% !important;
+			margin-left: 0 !important;
+			margin-right: 0 !important;
+			left: auto !important;
+			right: auto !important;
+			transform: none !important;
+			position: relative !important;
+		}
+		.single-portfolio .entry-footer,
+		.single-portfolio .comment-respond,
+		.single-portfolio .comments-area {
+			max-width: 1240px !important;
+			margin: 0 !important;
+			width: 100% !important;
+		}';
+	}
+
+	// Social media brand colors
+	$brand_colors = get_theme_mod( 'minimalio_settings_social_brand_colors', 'no' );
+	if ( $brand_colors !== 'yes' ) {
+		$css .= '.socials__icon, .single-post__icons { color: currentColor; fill: currentColor; } ';
+	}
+	if ( $brand_colors === 'yes' ) {
+		$colors = [
+			'mail'       => '#EA4335',
+			'facebook'   => '#1877F2',
+			'instagram'  => '#E4405F',
+			'twitter'    => '#1DA1F2',
+			'linkedin'   => '#0A66C2',
+			'pinterest'  => '#BD081C',
+			'youtube'    => '#FF0000',
+			'vimeo'      => '#1AB7EA',
+			'applemusic' => '#FA243C',
+			'bandcamp'   => '#629AA9',
+			'behance'    => '#1769FF',
+			'bluesky'    => '#0085FF',
+			'codepen'    => '#000000',
+			'deviantart' => '#05CC47',
+			'dribbble'   => '#EA4C89',
+			'discord'    => '#5865F2',
+			'etsy'       => '#F1641E',
+			'flickr'     => '#0063DC',
+			'github'     => '#181717',
+			'goodreads'  => '#372213',
+			'imdb'       => '#F5C518',
+			'lastfm'     => '#D51007',
+			'mastodon'   => '#6364FF',
+			'medium'     => '#000000',
+			'patreon'    => '#FF424D',
+			'pixelfed'   => '#6364FF',
+			'reddit'     => '#FF4500',
+			'rss'        => '#FFA500',
+			'snapchat'   => '#FFFC00',
+			'soundcloud' => '#FF3300',
+			'spotify'    => '#1DB954',
+			'tiktok'     => '#000000',
+			'twitch'     => '#9146FF',
+			'vk'         => '#0077FF',
+			'x'          => '#000000',
+		];
+
+		foreach ( $colors as $network => $color ) {
+			$css .= sprintf(
+				'.socials__icon--%1$s, .single-post__%1$s { color: %2$s; fill: %2$s; } ',
+				esc_attr( $network ),
+				esc_attr( $color )
+			);
+		}
 	}
 
 	if ( ! empty( $css ) ) {
@@ -543,6 +634,83 @@ function oneguy_customize_register( $customizer ) {
 				'choices'           => [
 					'constrained' => esc_html__( 'Constrained', 'oneguy' ),
 					'full'        => esc_html__( 'Full-Width Gutenberg (Default)', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Portfolio Options: Content Width Behavior
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_portfolio_content_width_behavior', [
+		'default'           => 'full',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_portfolio_content_width_behavior',
+			[
+				'label'             => esc_html__( 'Content Width Behavior', 'oneguy' ),
+				'description'       => esc_html__( 'Control how featured images and Gutenberg content are displayed in portfolio posts', 'oneguy' ),
+				'section'           => 'minimalio_portfolio_options',
+				'settings'          => 'minimalio_settings_portfolio_content_width_behavior',
+				'type'              => 'select',
+				'sanitize_callback' => 'sanitize_text_field',
+				'choices'           => [
+					'constrained' => esc_html__( 'Constrained', 'oneguy' ),
+					'full'        => esc_html__( 'Full-Width Gutenberg (Default)', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Social Media: Brand Colors (shared setting, shown in both sections)
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_social_brand_colors', [
+		'default'           => 'no',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_social_brand_colors',
+			[
+				'label'       => esc_html__( 'Social Icons Brand Colors', 'oneguy' ),
+				'description' => esc_html__( 'Applies to social icons and share buttons everywhere.', 'oneguy' ),
+				'section'     => 'minimalio_social_media',
+				'settings'    => 'minimalio_settings_social_brand_colors',
+				'type'        => 'select',
+				'priority'    => 200,
+				'choices'     => [
+					'no'  => esc_html__( 'No (Inherit Text Color)', 'oneguy' ),
+					'yes' => esc_html__( 'Yes (Brand Colors)', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	// Same control in Portfolio Settings for discoverability
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_portfolio_share_brand_colors',
+			[
+				'label'       => esc_html__( 'Share Icons Brand Colors', 'oneguy' ),
+				'description' => esc_html__( 'Applies to social icons and share buttons everywhere.', 'oneguy' ),
+				'section'     => 'minimalio_portfolio_options',
+				'settings'    => 'minimalio_settings_social_brand_colors',
+				'type'        => 'select',
+				'choices'     => [
+					'no'  => esc_html__( 'No (Inherit Text Color)', 'oneguy' ),
+					'yes' => esc_html__( 'Yes (Brand Colors)', 'oneguy' ),
 				],
 			]
 		)
