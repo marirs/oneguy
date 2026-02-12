@@ -391,6 +391,39 @@ function oneguy_dynamic_css() {
 		}';
 	}
 
+	// Typography: Font sizes
+	$font_size_map = [
+		'body'       => 'body',
+		'p'          => 'p',
+		'h1'         => 'h1',
+		'h2'         => 'h2',
+		'h3'         => 'h3',
+		'h4'         => 'h4',
+		'h5'         => 'h5',
+		'h6'         => 'h6',
+		'blockquote' => 'blockquote',
+		'li'         => 'li, ol li, ul li',
+	];
+	foreach ( $font_size_map as $key => $selector ) {
+		$size = get_theme_mod( 'minimalio_settings_font_size_' . $key );
+		if ( $size ) {
+			// Auto-append px if user entered just a number
+			if ( is_numeric( $size ) ) {
+				$size .= 'px';
+			}
+			$css .= sprintf( '%s { font-size: %s !important; } ', esc_attr( $selector ), esc_attr( $size ) );
+		}
+	}
+
+	// Single portfolio featured image size
+	$image_size = get_theme_mod( 'minimalio_settings_single_portfolio_image_ratio', 'original' );
+	if ( $image_size && $image_size !== 'original' ) {
+		$css .= sprintf(
+			'.single-portfolio .single-post__thumbnail img { width: %s !important; height: auto; } ',
+			esc_attr( $image_size )
+		);
+	}
+
 	// Portfolio comment title colors
 	// Portfolio display title color (showcase/archive page)
 	$portfolio_title_color = get_theme_mod( 'minimalio_settings_portfolio_title_color' );
@@ -411,6 +444,18 @@ function oneguy_dynamic_css() {
 	$comment_reply_color = get_theme_mod( 'minimalio_settings_single_portfolio_comments_reply_color' );
 	if ( $comment_reply_color ) {
 		$css .= sprintf( '.single-portfolio .comments-title { color: %s; } ', esc_attr( $comment_reply_color ) );
+	}
+
+	// Blog single post title color
+	$blog_title_color = get_theme_mod( 'minimalio_settings_single_post_title_color' );
+	if ( $blog_title_color ) {
+		$css .= sprintf( '.single-post .entry-title { color: %s !important; } ', esc_attr( $blog_title_color ) );
+	}
+
+	// Blog list page title color
+	$blog_list_title_color = get_theme_mod( 'minimalio_settings_blog_list_title_color' );
+	if ( $blog_list_title_color ) {
+		$css .= sprintf( '.blog-post-type .post-card__heading { color: %s !important; } ', esc_attr( $blog_list_title_color ) );
 	}
 
 	// Blog title bottom spacing
@@ -772,6 +817,50 @@ function oneguy_customize_register( $customizer ) {
 	);
 
 	// =========================================================================
+	// Typography: Font Size Controls
+	// =========================================================================
+
+	$font_size_elements = [
+		'body'       => [ 'label' => 'Body Font Size (px)',       'default' => '' ],
+		'p'          => [ 'label' => 'Paragraph Font Size (px)',  'default' => '' ],
+		'h1'         => [ 'label' => 'H1 Font Size (px)',         'default' => '' ],
+		'h2'         => [ 'label' => 'H2 Font Size (px)',         'default' => '' ],
+		'h3'         => [ 'label' => 'H3 Font Size (px)',         'default' => '' ],
+		'h4'         => [ 'label' => 'H4 Font Size (px)',         'default' => '' ],
+		'h5'         => [ 'label' => 'H5 Font Size (px)',         'default' => '' ],
+		'h6'         => [ 'label' => 'H6 Font Size (px)',         'default' => '' ],
+		'blockquote' => [ 'label' => 'Blockquote Font Size (px)', 'default' => '' ],
+		'li'         => [ 'label' => 'List Item Font Size (px)',  'default' => '' ],
+	];
+
+	foreach ( $font_size_elements as $element => $config ) {
+		$setting_id = 'minimalio_settings_font_size_' . $element;
+		$control_id = 'minimalio_options_font_size_' . $element;
+
+		$customizer->add_setting( $setting_id, [
+			'default'           => $config['default'],
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		]);
+
+		$customizer->add_control(
+			new WP_Customize_Control(
+				$customizer,
+				$control_id,
+				[
+					'label'       => esc_html__( $config['label'], 'oneguy' ),
+					'description' => $element === 'body'
+						? esc_html__( 'Enter a number (px assumed) or with unit, e.g. 16, 1.2rem — leave empty for default', 'oneguy' )
+						: '',
+					'section'     => 'minimalio_typography_settings',
+					'settings'    => $setting_id,
+					'type'        => 'text',
+				]
+			)
+		);
+	}
+
+	// =========================================================================
 	// Blog Options: Text Alignment + Content Width Behavior
 	// =========================================================================
 
@@ -850,6 +939,46 @@ function oneguy_customize_register( $customizer ) {
 					'2rem'   => esc_html__( '2rem - Default', 'oneguy' ),
 					'3rem'   => esc_html__( '3rem - Large', 'oneguy' ),
 				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Blog Options: Title Colors
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_single_post_title_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_single_post_title_color',
+			[
+				'label'    => esc_html__( 'Single Post Title Color', 'oneguy' ),
+				'section'  => 'minimalio_blog_options',
+				'settings' => 'minimalio_settings_single_post_title_color',
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_blog_list_title_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_blog_list_title_color',
+			[
+				'label'    => esc_html__( 'Blog List Title Color', 'oneguy' ),
+				'section'  => 'minimalio_blog_options',
+				'settings' => 'minimalio_settings_blog_list_title_color',
 			]
 		)
 	);
@@ -952,6 +1081,40 @@ function oneguy_customize_register( $customizer ) {
 				'label'    => esc_html__( 'Replies Title Color', 'oneguy' ),
 				'section'  => 'minimalio_blog_options',
 				'settings' => 'minimalio_settings_single_post_comments_reply_color',
+			]
+		)
+	);
+
+	// =========================================================================
+	// Portfolio Options: Single Portfolio Featured Image Aspect Ratio
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_single_portfolio_image_ratio', [
+		'default'           => 'original',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_single_portfolio_image_ratio',
+			[
+				'label'       => esc_html__( 'Featured Image Size', 'oneguy' ),
+				'description' => esc_html__( 'Resize the featured image proportionally on single portfolio pages.', 'oneguy' ),
+				'section'     => 'minimalio_portfolio_options',
+				'settings'    => 'minimalio_settings_single_portfolio_image_ratio',
+				'type'        => 'select',
+				'choices'     => [
+					'original' => esc_html__( 'Original (Full Width)', 'oneguy' ),
+					'90%'      => esc_html__( '90%', 'oneguy' ),
+					'80%'      => esc_html__( '80%', 'oneguy' ),
+					'75%'      => esc_html__( '75% (3/4)', 'oneguy' ),
+					'66.66%'   => esc_html__( '66% (2/3)', 'oneguy' ),
+					'50%'      => esc_html__( '50% (1/2)', 'oneguy' ),
+					'33.33%'   => esc_html__( '33% (1/3)', 'oneguy' ),
+					'25%'      => esc_html__( '25% (1/4)', 'oneguy' ),
+				],
 			]
 		)
 	);
