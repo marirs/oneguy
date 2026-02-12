@@ -1,0 +1,23 @@
+/*
+ Theme Name:   Oneguy
+ Theme URI:    
+ Description:  Child theme of Minimalio with custom fonts, tagline display, header extra text, content width control, and typography enhancements.
+ Author:       
+ Author URI:   
+ Template:     minimalio
+ Version:      1.0.0
+ License:      GNU General Public License v2 or later
+ License URI:  http://www.gnu.org/licenses/gpl-2.0.html
+ Text Domain:  oneguy
+*/
+
+/* ==========================================================================
+   Vertical Header - Extra Text
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .vertical .header .header__extra-text {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+}
