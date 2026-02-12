@@ -92,6 +92,116 @@ if ( ! function_exists( 'minimalio_get_font_weight_from_variant' ) ) {
 }
 
 /**
+ * Fallback Google Fonts list when the API is unreachable.
+ * Key = slug (spaces replaced with +), Value = display name.
+ */
+function oneguy_get_fallback_google_fonts() {
+	return [
+		'ABeeZee'              => 'ABeeZee',
+		'Abel'                 => 'Abel',
+		'Abril+Fatface'        => 'Abril Fatface',
+		'Alegreya'             => 'Alegreya',
+		'Alegreya+Sans'        => 'Alegreya Sans',
+		'Amatic+SC'            => 'Amatic SC',
+		'Archivo'              => 'Archivo',
+		'Archivo+Narrow'       => 'Archivo Narrow',
+		'Arimo'                => 'Arimo',
+		'Arvo'                 => 'Arvo',
+		'Asap'                 => 'Asap',
+		'Assistant'            => 'Assistant',
+		'Barlow'               => 'Barlow',
+		'Barlow+Condensed'     => 'Barlow Condensed',
+		'Bebas+Neue'           => 'Bebas Neue',
+		'Bitter'               => 'Bitter',
+		'Cabin'                => 'Cabin',
+		'Cairo'                => 'Cairo',
+		'Catamaran'            => 'Catamaran',
+		'Caveat'               => 'Caveat',
+		'Comfortaa'            => 'Comfortaa',
+		'Cormorant+Garamond'   => 'Cormorant Garamond',
+		'Crimson+Text'         => 'Crimson Text',
+		'DM+Sans'              => 'DM Sans',
+		'DM+Serif+Display'     => 'DM Serif Display',
+		'Dancing+Script'       => 'Dancing Script',
+		'Dosis'                => 'Dosis',
+		'EB+Garamond'          => 'EB Garamond',
+		'Exo+2'                => 'Exo 2',
+		'Fira+Sans'            => 'Fira Sans',
+		'Fira+Sans+Condensed'  => 'Fira Sans Condensed',
+		'Fjalla+One'           => 'Fjalla One',
+		'Heebo'                => 'Heebo',
+		'Hind'                 => 'Hind',
+		'Hind+Siliguri'        => 'Hind Siliguri',
+		'IBM+Plex+Mono'        => 'IBM Plex Mono',
+		'IBM+Plex+Sans'        => 'IBM Plex Sans',
+		'IBM+Plex+Serif'       => 'IBM Plex Serif',
+		'Inconsolata'          => 'Inconsolata',
+		'Inter'                => 'Inter',
+		'Josefin+Sans'         => 'Josefin Sans',
+		'Josefin+Slab'         => 'Josefin Slab',
+		'Jost'                 => 'Jost',
+		'Kanit'                => 'Kanit',
+		'Karla'                => 'Karla',
+		'Lato'                 => 'Lato',
+		'Lexend'               => 'Lexend',
+		'Libre+Baskerville'    => 'Libre Baskerville',
+		'Libre+Franklin'       => 'Libre Franklin',
+		'Lora'                 => 'Lora',
+		'Manrope'              => 'Manrope',
+		'Maven+Pro'            => 'Maven Pro',
+		'Merriweather'         => 'Merriweather',
+		'Merriweather+Sans'    => 'Merriweather Sans',
+		'Montserrat'           => 'Montserrat',
+		'Montserrat+Alternates' => 'Montserrat Alternates',
+		'Mukta'                => 'Mukta',
+		'Mulish'               => 'Mulish',
+		'Nanum+Gothic'         => 'Nanum Gothic',
+		'Noto+Sans'            => 'Noto Sans',
+		'Noto+Sans+JP'         => 'Noto Sans JP',
+		'Noto+Serif'           => 'Noto Serif',
+		'Nunito'               => 'Nunito',
+		'Nunito+Sans'          => 'Nunito Sans',
+		'Old+Standard+TT'      => 'Old Standard TT',
+		'Open+Sans'            => 'Open Sans',
+		'Oswald'               => 'Oswald',
+		'Outfit'               => 'Outfit',
+		'Overpass'             => 'Overpass',
+		'Oxygen'               => 'Oxygen',
+		'PT+Sans'              => 'PT Sans',
+		'PT+Serif'             => 'PT Serif',
+		'Pacifico'             => 'Pacifico',
+		'Playfair+Display'     => 'Playfair Display',
+		'Poppins'              => 'Poppins',
+		'Prompt'               => 'Prompt',
+		'Quicksand'            => 'Quicksand',
+		'Rajdhani'             => 'Rajdhani',
+		'Raleway'              => 'Raleway',
+		'Roboto'               => 'Roboto',
+		'Roboto+Condensed'     => 'Roboto Condensed',
+		'Roboto+Mono'          => 'Roboto Mono',
+		'Roboto+Slab'          => 'Roboto Slab',
+		'Rubik'                => 'Rubik',
+		'Saira+Condensed'      => 'Saira Condensed',
+		'Satisfy'              => 'Satisfy',
+		'Shadows+Into+Light'   => 'Shadows Into Light',
+		'Signika+Negative'     => 'Signika Negative',
+		'Slabo+27px'           => 'Slabo 27px',
+		'Source+Code+Pro'      => 'Source Code Pro',
+		'Source+Sans+3'        => 'Source Sans 3',
+		'Source+Serif+4'       => 'Source Serif 4',
+		'Space+Grotesk'        => 'Space Grotesk',
+		'Space+Mono'           => 'Space Mono',
+		'Spectral'             => 'Spectral',
+		'Titillium+Web'        => 'Titillium Web',
+		'Ubuntu'               => 'Ubuntu',
+		'Varela+Round'         => 'Varela Round',
+		'Work+Sans'            => 'Work Sans',
+		'Yanone+Kaffeesatz'    => 'Yanone Kaffeesatz',
+		'Zilla+Slab'           => 'Zilla Slab',
+	];
+}
+
+/**
  * Override parent's font family CSS generation to support custom fonts
  */
 function oneguy_override_dynamic_styles() {
@@ -164,6 +274,11 @@ add_action( 'wp_enqueue_scripts', 'oneguy_load_extra_text_font' );
 function oneguy_portfolio_comment_form_title( $defaults ) {
 	if ( is_singular( 'portfolio' ) ) {
 		$custom_title = get_theme_mod( 'minimalio_settings_single_portfolio_comments_title' );
+		if ( $custom_title ) {
+			$defaults['title_reply'] = esc_html( $custom_title );
+		}
+	} elseif ( is_singular( 'post' ) ) {
+		$custom_title = get_theme_mod( 'minimalio_settings_single_post_comments_title' );
 		if ( $custom_title ) {
 			$defaults['title_reply'] = esc_html( $custom_title );
 		}
@@ -277,6 +392,18 @@ function oneguy_dynamic_css() {
 	}
 
 	// Portfolio comment title colors
+	// Portfolio display title color (showcase/archive page)
+	$portfolio_title_color = get_theme_mod( 'minimalio_settings_portfolio_title_color' );
+	if ( $portfolio_title_color ) {
+		$css .= sprintf( '.portfolio-post-type .post-card__heading { color: %s !important; } ', esc_attr( $portfolio_title_color ) );
+	}
+
+	// Single portfolio title color (inner post page)
+	$single_portfolio_title_color = get_theme_mod( 'minimalio_settings_single_portfolio_title_color' );
+	if ( $single_portfolio_title_color ) {
+		$css .= sprintf( 'body.single-portfolio .entry-title, .single-portfolio .entry-title { color: %s !important; } ', esc_attr( $single_portfolio_title_color ) );
+	}
+
 	$comment_title_color = get_theme_mod( 'minimalio_settings_single_portfolio_comments_title_color' );
 	if ( $comment_title_color ) {
 		$css .= sprintf( '.single-portfolio .comment-reply-title { color: %s; } ', esc_attr( $comment_title_color ) );
@@ -284,6 +411,22 @@ function oneguy_dynamic_css() {
 	$comment_reply_color = get_theme_mod( 'minimalio_settings_single_portfolio_comments_reply_color' );
 	if ( $comment_reply_color ) {
 		$css .= sprintf( '.single-portfolio .comments-title { color: %s; } ', esc_attr( $comment_reply_color ) );
+	}
+
+	// Blog title bottom spacing
+	$title_gap = get_theme_mod( 'minimalio_settings_single_post_title_gap', '2rem' );
+	if ( $title_gap !== '2rem' ) {
+		$css .= sprintf( '.single-post .entry-title { padding-bottom: %s !important; } ', esc_attr( $title_gap ) );
+	}
+
+	// Blog comment title colors
+	$blog_comment_title_color = get_theme_mod( 'minimalio_settings_single_post_comments_title_color' );
+	if ( $blog_comment_title_color ) {
+		$css .= sprintf( '.single-post .comment-reply-title { color: %s; } ', esc_attr( $blog_comment_title_color ) );
+	}
+	$blog_comment_reply_color = get_theme_mod( 'minimalio_settings_single_post_comments_reply_color' );
+	if ( $blog_comment_reply_color ) {
+		$css .= sprintf( '.single-post .comments-title { color: %s; } ', esc_attr( $blog_comment_reply_color ) );
 	}
 
 	// Social media brand colors
@@ -479,33 +622,44 @@ function oneguy_customize_register( $customizer ) {
 			$custom_font_choices[ 'custom_' . $font_id ] = $font_data['name'] . ' (Custom)';
 		}
 
-		// Rebuild with dividers if custom fonts exist
-		if ( ! empty( $custom_font_choices ) ) {
-			$safe_fonts = [
-				'Arial', 'Verdana', 'Tahoma', 'Times+New+Roman',
-				'Georgia', 'Garamond', 'Courier+New', 'Brush+Script+MT',
-			];
+		// Always rebuild with dividers and sections
+		$safe_fonts = [
+			'Arial', 'Verdana', 'Tahoma', 'Times+New+Roman',
+			'Georgia', 'Garamond', 'Courier+New', 'Brush+Script+MT',
+		];
 
-			$safe_choices   = [];
-			$google_choices = [];
-			foreach ( $font_control->choices as $key => $label ) {
-				if ( in_array( $key, $safe_fonts, true ) ) {
-					$safe_choices[ $key ] = $label;
-				} else {
-					$google_choices[ $key ] = $label;
-				}
+		$safe_choices   = [];
+		$google_choices = [];
+		foreach ( $font_control->choices as $key => $label ) {
+			if ( in_array( $key, $safe_fonts, true ) ) {
+				$safe_choices[ $key ] = $label;
+			} else {
+				$google_choices[ $key ] = $label;
 			}
+		}
 
-			$new_choices = [];
+		// Fallback: if Google Fonts API returned nothing, use a bundled list
+		if ( empty( $google_choices ) ) {
+			$google_choices = oneguy_get_fallback_google_fonts();
+		}
+
+		$new_choices = [];
+
+		// Only show custom fonts section if there are custom fonts
+		if ( ! empty( $custom_font_choices ) ) {
 			$new_choices['--- Your Custom Fonts ---'] = '--- Your Custom Fonts ---';
 			$new_choices = array_merge( $new_choices, $custom_font_choices );
-			$new_choices['--- Default Fonts ---'] = '--- Default Fonts ---';
-			$new_choices = array_merge( $new_choices, $safe_choices );
+		}
+
+		$new_choices['--- Default Fonts ---'] = '--- Default Fonts ---';
+		$new_choices = array_merge( $new_choices, $safe_choices );
+
+		if ( ! empty( $google_choices ) ) {
 			$new_choices['--- Google Fonts ---'] = '--- Google Fonts ---';
 			$new_choices = array_merge( $new_choices, $google_choices );
-
-			$font_control->choices = $new_choices;
 		}
+
+		$font_control->choices = $new_choices;
 
 		$font_control->label = esc_html__( 'Fonts', 'oneguy' );
 	}
@@ -673,6 +827,135 @@ function oneguy_customize_register( $customizer ) {
 		)
 	);
 
+	$customizer->add_setting( 'minimalio_settings_single_post_title_gap', [
+		'default'           => '2rem',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_single_post_title_gap',
+			[
+				'label'    => esc_html__( 'Title Bottom Spacing', 'oneguy' ),
+				'section'  => 'minimalio_blog_options',
+				'settings' => 'minimalio_settings_single_post_title_gap',
+				'type'     => 'select',
+				'choices'  => [
+					'0'      => esc_html__( 'None', 'oneguy' ),
+					'0.5rem' => esc_html__( '0.5rem - Tight', 'oneguy' ),
+					'1rem'   => esc_html__( '1rem - Small', 'oneguy' ),
+					'1.5rem' => esc_html__( '1.5rem - Medium', 'oneguy' ),
+					'2rem'   => esc_html__( '2rem - Default', 'oneguy' ),
+					'3rem'   => esc_html__( '3rem - Large', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	// Same control in Blog Options for discoverability
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_blog_share_brand_colors',
+			[
+				'label'       => esc_html__( 'Share Icons Brand Colors', 'oneguy' ),
+				'description' => esc_html__( 'Applies to social icons and share buttons everywhere.', 'oneguy' ),
+				'section'     => 'minimalio_blog_options',
+				'settings'    => 'minimalio_settings_social_brand_colors',
+				'type'        => 'select',
+				'choices'     => [
+					'no'  => esc_html__( 'No (Inherit Text Color)', 'oneguy' ),
+					'yes' => esc_html__( 'Yes (Brand Colors)', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Blog Options: Comments
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_single_post_comments', [
+		'default'           => 'yes',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_single_post_comments',
+			[
+				'label'    => esc_html__( 'Show and Allow Comments', 'oneguy' ),
+				'section'  => 'minimalio_blog_options',
+				'settings' => 'minimalio_settings_single_post_comments',
+				'type'     => 'select',
+				'choices'  => [
+					'yes' => esc_html__( 'Yes', 'oneguy' ),
+					'no'  => esc_html__( 'No', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_single_post_comments_title', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_single_post_comments_title',
+			[
+				'label'       => esc_html__( 'Comment Form Title', 'oneguy' ),
+				'description' => esc_html__( 'Leave empty for default "Leave a Reply".', 'oneguy' ),
+				'section'     => 'minimalio_blog_options',
+				'settings'    => 'minimalio_settings_single_post_comments_title',
+				'type'        => 'text',
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_single_post_comments_title_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_single_post_comments_title_color',
+			[
+				'label'    => esc_html__( '"Leave a Reply" Title Color', 'oneguy' ),
+				'section'  => 'minimalio_blog_options',
+				'settings' => 'minimalio_settings_single_post_comments_title_color',
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_single_post_comments_reply_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_single_post_comments_reply_color',
+			[
+				'label'    => esc_html__( 'Replies Title Color', 'oneguy' ),
+				'section'  => 'minimalio_blog_options',
+				'settings' => 'minimalio_settings_single_post_comments_reply_color',
+			]
+		)
+	);
+
 	// =========================================================================
 	// Portfolio Options: Content Width Behavior
 	// =========================================================================
@@ -698,6 +981,52 @@ function oneguy_customize_register( $customizer ) {
 					'constrained' => esc_html__( 'Constrained', 'oneguy' ),
 					'full'        => esc_html__( 'Full-Width Gutenberg (Default)', 'oneguy' ),
 				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Portfolio Options: Portfolio Title Color (archive/grid page)
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_portfolio_title_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_portfolio_title_color',
+			[
+				'label'    => esc_html__( 'Portfolio Title Color', 'oneguy' ),
+				'section'  => 'minimalio_portfolio_options',
+				'settings' => 'minimalio_settings_portfolio_title_color',
+				'priority' => 10,
+			]
+		)
+	);
+
+	// =========================================================================
+	// Portfolio Options: Single Portfolio Title Color (inner post page)
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_single_portfolio_title_color', [
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_hex_color',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Color_Control(
+			$customizer,
+			'minimalio_options_single_portfolio_title_color',
+			[
+				'label'    => esc_html__( 'Single Portfolio Title Color', 'oneguy' ),
+				'section'  => 'minimalio_portfolio_options',
+				'settings' => 'minimalio_settings_single_portfolio_title_color',
+				'priority' => 10,
 			]
 		)
 	);
@@ -795,24 +1124,7 @@ function oneguy_customize_register( $customizer ) {
 		'transport'         => 'refresh',
 	]);
 
-	$customizer->add_control(
-		new WP_Customize_Control(
-			$customizer,
-			'minimalio_options_social_brand_colors',
-			[
-				'label'       => esc_html__( 'Social Icons Brand Colors', 'oneguy' ),
-				'description' => esc_html__( 'Applies to social icons and share buttons everywhere.', 'oneguy' ),
-				'section'     => 'minimalio_social_media',
-				'settings'    => 'minimalio_settings_social_brand_colors',
-				'type'        => 'select',
-				'priority'    => 200,
-				'choices'     => [
-					'no'  => esc_html__( 'No (Inherit Text Color)', 'oneguy' ),
-					'yes' => esc_html__( 'Yes (Brand Colors)', 'oneguy' ),
-				],
-			]
-		)
-	);
+	// Social Media brand colors control is registered in oneguy_reposition_brand_colors()
 
 	// Same control in Portfolio Settings for discoverability
 	$customizer->add_control(
@@ -849,14 +1161,41 @@ function oneguy_customize_register( $customizer ) {
 add_action( 'customize_register', 'oneguy_customize_register', 20 );
 
 /**
+ * Reposition brand colors control after plugin controls have been registered
+ */
+function oneguy_reposition_brand_colors( $customizer ) {
+	$customizer->remove_control( 'minimalio_options_social_brand_colors' );
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_social_brand_colors',
+			[
+				'label'       => esc_html__( 'Social Icons Brand Colors', 'oneguy' ),
+				'description' => esc_html__( 'Applies to social icons and share buttons everywhere.', 'oneguy' ),
+				'section'     => 'minimalio_social_media',
+				'settings'    => 'minimalio_settings_social_brand_colors',
+				'type'        => 'select',
+				'priority'    => 3,
+				'choices'     => [
+					'no'  => esc_html__( 'No (Inherit Text Color)', 'oneguy' ),
+					'yes' => esc_html__( 'Yes (Brand Colors)', 'oneguy' ),
+				],
+			]
+		)
+	);
+}
+add_action( 'customize_register', 'oneguy_reposition_brand_colors', 999 );
+
+/**
  * Enqueue customizer controls JS for child theme
  */
 function oneguy_customizer_controls_js() {
 	wp_enqueue_script(
 		'oneguy-customizer-controls',
 		get_stylesheet_directory_uri() . '/js/customizer-controls.js',
-		[],
-		wp_get_theme()->get( 'Version' ),
+		[ 'jquery', 'customize-controls' ],
+		filemtime( get_stylesheet_directory() . '/js/customizer-controls.js' ),
 		true
 	);
 }
