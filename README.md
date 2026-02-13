@@ -3,7 +3,7 @@
 ![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759B?style=flat&logo=wordpress&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4?style=flat&logo=php&logoColor=white)
 ![Parent Theme](https://img.shields.io/badge/Parent_Theme-Minimalio-333333?style=flat)
-![Child Theme](https://img.shields.io/badge/Child_Theme-Oneguy-000000?style=flat)
+![Child Theme](https://img.shields.io/badge/Child_Theme-Oneguy-D90368?style=flat)
 ![License](https://img.shields.io/badge/License-GPL--2.0%2B-blue?style=flat)
 ![Customizer](https://img.shields.io/badge/Customizer-Ready-brightgreen?style=flat)
 ![Responsive](https://img.shields.io/badge/Responsive-Yes-success?style=flat)
