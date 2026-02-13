@@ -79,6 +79,7 @@ All typography controls are found in **Customizer → Typography Settings**.
 | Control | Description |
 |---|---|
 | **Blog Display Type** | Choose between **Grid**, **Masonry**, or **List** layout. |
+| **Blog List Style** | When List is selected: **Style 1 — Compact** or **Style 2 — Editorial** (see below). |
 | **Excerpt Word Count** | Number of words shown in the blog list excerpt (default: 40, range: 5–100). |
 | **Blog Text Alignment** | Align blog content left, center, or right. |
 | **Content Width Behavior** | `Full` (default) or `Constrained` (caps content at 1240px). |
@@ -89,13 +90,21 @@ All typography controls are found in **Customizer → Typography Settings**.
 | **Comments Title Color** | Color for the "Leave a Reply" heading. |
 | **Comments Reply Color** | Color for the "Comments" heading. |
 
-#### Blog List Layout
+#### Blog List Styles
 
-When **List** is selected as the display type:
+When **List** is selected as the display type, two styles are available via the **Blog List Style** dropdown:
 
-- Posts are shown in a compact list with a **170×170px thumbnail** on the left and **title, date, and excerpt** on the right.
-- Card-related controls (card style, image aspect ratio, card gap, hover color, columns) are automatically hidden in the Customizer.
-- The list is constrained to **1000px max-width** for comfortable reading.
+**Style 1 — Compact**
+- **170×170px thumbnail** on the left, **title, date, and excerpt** on the right.
+- Constrained to **1000px max-width** for comfortable reading.
+
+**Style 2 — Editorial**
+- **Large landscape featured image** on top (full width of the first two columns).
+- Below the image: **3-column layout** — post title (left), excerpt (center), and meta info with date, author, and comment count (right, uppercase).
+
+Both styles share these behaviors:
+- **Blog List Style** and **Excerpt Word Count** controls appear only when List is selected.
+- Card-related controls (card style, image aspect ratio, card gap, hover color, columns) are automatically hidden.
 - Fully responsive — stacks vertically on mobile (≤480px).
 
 ---
