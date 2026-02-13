@@ -142,6 +142,22 @@
 			});
 		});
 
+		// Only show Heart Position when Heart/Like is enabled
+		wp.customize('minimalio_settings_portfolio_heart_enable', function (setting) {
+			wp.customize.control('minimalio_options_portfolio_heart_position', function (control) {
+				var visibility = function () {
+					if ('yes' === setting.get()) {
+						control.container.slideDown(180);
+					} else {
+						control.container.slideUp(180);
+					}
+				};
+
+				visibility();
+				setting.bind(visibility);
+			});
+		});
+
 		// Disable divider options in the extra text font dropdown
 		wp.customize.control('minimalio_header_options_header_extra_text_font', function (control) {
 			control.container.find('select option').each(function () {

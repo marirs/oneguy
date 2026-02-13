@@ -298,6 +298,154 @@ function oneguy_portfolio_comment_support() {
 add_action( 'init', 'oneguy_portfolio_comment_support' );
 
 /**
+ * Portfolio Heart/Like AJAX handler
+ */
+function oneguy_portfolio_heart_ajax() {
+	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+	if ( ! $post_id ) {
+		wp_send_json_error( 'Invalid post ID' );
+	}
+
+	check_ajax_referer( 'oneguy_heart_nonce', 'nonce' );
+
+	$ip = $_SERVER['REMOTE_ADDR'];
+	if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$forwarded = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
+		$ip = trim( $forwarded[0] );
+	}
+	$ip = sanitize_text_field( $ip );
+
+	$liked_ips = get_post_meta( $post_id, '_oneguy_heart_ips', true );
+	if ( ! is_array( $liked_ips ) ) {
+		$liked_ips = [];
+	}
+
+	$count = absint( get_post_meta( $post_id, '_oneguy_heart_count', true ) );
+
+	if ( in_array( $ip, $liked_ips, true ) ) {
+		// Already liked — unlike
+		$liked_ips = array_diff( $liked_ips, [ $ip ] );
+		$count     = max( 0, $count - 1 );
+		$liked     = false;
+	} else {
+		// New like
+		$liked_ips[] = $ip;
+		$count++;
+		$liked = true;
+	}
+
+	update_post_meta( $post_id, '_oneguy_heart_ips', $liked_ips );
+	update_post_meta( $post_id, '_oneguy_heart_count', $count );
+
+	wp_send_json_success( [
+		'count' => $count,
+		'liked' => $liked,
+	] );
+}
+add_action( 'wp_ajax_oneguy_portfolio_heart', 'oneguy_portfolio_heart_ajax' );
+add_action( 'wp_ajax_nopriv_oneguy_portfolio_heart', 'oneguy_portfolio_heart_ajax' );
+
+/**
+ * Enqueue heart/like assets on single portfolio pages
+ */
+function oneguy_enqueue_heart_assets() {
+	if ( ! is_singular( 'portfolio' ) ) {
+		return;
+	}
+	if ( get_theme_mod( 'minimalio_settings_portfolio_heart_enable', 'no' ) !== 'yes' ) {
+		return;
+	}
+
+	wp_enqueue_script(
+		'oneguy-heart',
+		get_stylesheet_directory_uri() . '/js/portfolio-heart.js',
+		[],
+		wp_get_theme()->get( 'Version' ),
+		true
+	);
+
+	$ip = $_SERVER['REMOTE_ADDR'];
+	if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$forwarded = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
+		$ip = trim( $forwarded[0] );
+	}
+	$ip = sanitize_text_field( $ip );
+
+	$post_id   = get_the_ID();
+	$liked_ips = get_post_meta( $post_id, '_oneguy_heart_ips', true );
+	if ( ! is_array( $liked_ips ) ) {
+		$liked_ips = [];
+	}
+
+	wp_localize_script( 'oneguy-heart', 'oneguyHeart', [
+		'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+		'nonce'    => wp_create_nonce( 'oneguy_heart_nonce' ),
+		'postId'   => $post_id,
+		'liked'    => in_array( $ip, $liked_ips, true ),
+		'count'    => absint( get_post_meta( $post_id, '_oneguy_heart_count', true ) ),
+		'position' => get_theme_mod( 'minimalio_settings_portfolio_heart_position', 'bottom-right' ),
+	] );
+}
+add_action( 'wp_enqueue_scripts', 'oneguy_enqueue_heart_assets' );
+
+/**
+ * Inject heart overlay on the portfolio featured image
+ */
+function oneguy_portfolio_heart_overlay( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
+	if ( ! is_singular( 'portfolio' ) ) {
+		return $html;
+	}
+	if ( get_theme_mod( 'minimalio_settings_portfolio_heart_enable', 'no' ) !== 'yes' ) {
+		return $html;
+	}
+	if ( get_queried_object_id() !== $post_id ) {
+		return $html;
+	}
+
+	$position = get_theme_mod( 'minimalio_settings_portfolio_heart_position', 'bottom-right' );
+
+	// Only overlay on image for image-based positions
+	if ( $position !== 'bottom-left' && $position !== 'bottom-right' ) {
+		return $html;
+	}
+
+	$count = absint( get_post_meta( $post_id, '_oneguy_heart_count', true ) );
+
+	$pos_style = $position === 'bottom-left'
+		? 'left: 16px; right: auto;'
+		: 'right: 16px; left: auto;';
+
+	$heart_html = sprintf(
+		'<button class="oneguy-heart-btn" data-post-id="%d" style="position: absolute; bottom: 16px; %s z-index: 10; background: rgba(0,0,0,0.5); border: none; border-radius: 50px; padding: 8px 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #fff; font-size: 14px; line-height: 1; transition: all 0.2s ease;" aria-label="Like this portfolio item">'
+		. '<svg class="oneguy-heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: all 0.2s ease;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>'
+		. '<span class="oneguy-heart-count">%d</span>'
+		. '</button>',
+		esc_attr( $post_id ),
+		$pos_style,
+		$count
+	);
+
+	return '<div class="oneguy-heart-wrapper" style="position: relative; display: inline-block; width: 100%;">' . $html . $heart_html . '</div>';
+}
+add_filter( 'post_thumbnail_html', 'oneguy_portfolio_heart_overlay', 10, 5 );
+
+/**
+ * Generate heart button HTML for non-image positions (after-title, after-meta)
+ */
+function oneguy_get_heart_button_html( $post_id ) {
+	$count = absint( get_post_meta( $post_id, '_oneguy_heart_count', true ) );
+
+	return sprintf(
+		'<span class="oneguy-heart-btn flex mb-2 lg:mb-0 lg:mr-2" data-post-id="%d" style="cursor: pointer; align-items: center; gap: 4px; transition: all 0.2s ease;" aria-label="Like this portfolio item">'
+		. '<svg class="oneguy-heart-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: all 0.2s ease; vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>'
+		. '<span class="oneguy-heart-count">%d</span>'
+		. '</span>',
+		esc_attr( $post_id ),
+		$count
+	);
+}
+
+/**
  * Add additional dynamic CSS for child theme customizer options
  */
 function oneguy_dynamic_css() {
@@ -1343,6 +1491,58 @@ function oneguy_customize_register( $customizer ) {
 				'label'    => esc_html__( 'Replies Title Color', 'oneguy' ),
 				'section'  => 'minimalio_portfolio_options',
 				'settings' => 'minimalio_settings_single_portfolio_comments_reply_color',
+			]
+		)
+	);
+
+	// =========================================================================
+	// Portfolio Options: Heart/Like Feature
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_portfolio_heart_enable', [
+		'default'           => 'no',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_portfolio_heart_enable',
+			[
+				'label'       => esc_html__( 'Enable Heart/Like', 'oneguy' ),
+				'description' => esc_html__( 'Show a heart icon with like count on the single portfolio featured image. One like per IP address.', 'oneguy' ),
+				'section'     => 'minimalio_portfolio_options',
+				'settings'    => 'minimalio_settings_portfolio_heart_enable',
+				'type'        => 'select',
+				'choices'     => [
+					'no'  => esc_html__( 'No', 'oneguy' ),
+					'yes' => esc_html__( 'Yes', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	$customizer->add_setting( 'minimalio_settings_portfolio_heart_position', [
+		'default'           => 'bottom-right',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_portfolio_heart_position',
+			[
+				'label'    => esc_html__( 'Heart Position', 'oneguy' ),
+				'section'  => 'minimalio_portfolio_options',
+				'settings' => 'minimalio_settings_portfolio_heart_position',
+				'type'     => 'select',
+				'choices'  => [
+					'bottom-right' => esc_html__( 'Image — Bottom Right', 'oneguy' ),
+					'bottom-left'  => esc_html__( 'Image — Bottom Left', 'oneguy' ),
+					'after-meta'   => esc_html__( 'After Post Meta', 'oneguy' ),
+				],
 			]
 		)
 	);

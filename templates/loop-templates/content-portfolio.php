@@ -18,6 +18,9 @@ $minimalio_all_taxonomy = get_post_taxonomies( $post->ID );
 $show_title = get_theme_mod( 'minimalio_settings_single_portfolio_title' ) === 'yes';
 $show_share = get_theme_mod( 'minimalio_settings_single_portfolio_share' ) === 'yes';
 
+$oneguy_heart_enabled  = get_theme_mod( 'minimalio_settings_portfolio_heart_enable', 'no' ) === 'yes';
+$oneguy_heart_position = get_theme_mod( 'minimalio_settings_portfolio_heart_position', 'bottom-right' );
+
 ?>
 
 <article <?php post_class(); ?> id="post-<?php the_ID(); ?>">
@@ -72,8 +75,15 @@ $show_share = get_theme_mod( 'minimalio_settings_single_portfolio_share' ) === '
 						?>
 						<?php endif; ?>
 
-						<?php if ( $show_share ) : ?>
+						<?php if ( $oneguy_heart_enabled && $oneguy_heart_position === 'after-meta' ) : ?>
 							<?php if ( get_theme_mod( 'minimalio_settings_single_portfolio_metadata' ) === 'yes' ) : ?>
+								<span class="hidden mb-2 lg:block lg:mb-0 lg:mr-2">|</span>
+							<?php endif; ?>
+							<?php echo oneguy_get_heart_button_html( $post->ID ); ?>
+						<?php endif; ?>
+
+						<?php if ( $show_share ) : ?>
+							<?php if ( get_theme_mod( 'minimalio_settings_single_portfolio_metadata' ) === 'yes' || ( $oneguy_heart_enabled && $oneguy_heart_position === 'after-meta' ) ) : ?>
 								<span class="hidden mb-2 lg:block lg:mb-0 lg:mr-2">|</span>
 							<?php endif; ?>
 							<span class="flex flex-wrap items-center mb-2 lg:mb-0 lg:mr-2">
@@ -118,6 +128,10 @@ $show_share = get_theme_mod( 'minimalio_settings_single_portfolio_share' ) === '
 					</div>
 				</div>
 			</div><!-- .entry-meta -->
+		<?php endif; ?>
+
+		<?php if ( $oneguy_heart_enabled && $oneguy_heart_position === 'after-meta' && get_theme_mod( 'minimalio_settings_single_portfolio_metadata' ) !== 'yes' && ! $show_share ) : ?>
+			<?php echo oneguy_get_heart_button_html( $post->ID ); ?>
 		<?php endif; ?>
 	</header><!-- .entry-header -->
 
