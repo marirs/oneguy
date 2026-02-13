@@ -144,6 +144,16 @@ When **Enable Heart/Like** is set to "Yes":
 
 ---
 
+### Page Options
+
+| Control | Description |
+|---|---|
+| **Protect Images (Disable Right-Click)** | Prevents right-click context menu and drag-to-save on all images site-wide. Also blocks long-press save on mobile. |
+
+> **Note:** Image protection is a visual deterrent — it blocks casual saving via right-click, drag, and mobile long-press. It does not prevent determined users from using browser developer tools.
+
+---
+
 ### UI Enhancements
 
 | Feature | Description |
