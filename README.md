@@ -144,6 +144,16 @@ When **Enable Heart/Like** is set to "Yes":
 
 ---
 
+### UI Enhancements
+
+| Feature | Description |
+|---|---|
+| **Fade-in on Scroll** | Portfolio grid items fade in with a subtle slide-up animation as they enter the viewport. Uses `IntersectionObserver` — each item animates once. |
+| **Back to Top Button** | A floating circular button (bottom-right) appears after scrolling 300px. Smooth scrolls to top on click. Subtle hover lift effect. Responsive sizing on mobile. |
+| **Portfolio Hover Overlay** | Overrides the parent theme's solid hover overlay to be semi-transparent (60% opacity), so the image remains visible through the color tint. |
+
+---
+
 ### Social Media
 
 | Control | Description |
@@ -171,7 +181,8 @@ oneguy/
 ├── js/
 │   ├── customizer-controls.js  ← Customizer UI logic (visibility toggles, font dropdown)
 │   ├── content-width.js        ← Gutenberg constrained width override
-│   └── portfolio-heart.js      ← Heart/Like click handler + AJAX
+│   ├── portfolio-heart.js      ← Heart/Like click handler + AJAX
+│   └── enhancements.js         ← Fade-in on scroll + Back to top button
 └── templates/
     ├── blocks/
     │   └── blog-list.php       ← Blog list display template
