@@ -474,6 +474,15 @@ function oneguy_dynamic_css() {
 		$css .= sprintf( '.single-post .comments-title { color: %s; } ', esc_attr( $blog_comment_reply_color ) );
 	}
 
+	// Blog list view constraint
+	$blog_type = get_theme_mod( 'minimalio_settings_blog_type' );
+	if ( $blog_type === 'list' ) {
+		$css .= '.blog-list-view .blog-list__row {
+			max-width: 1000px !important;
+			table-layout: fixed !important;
+		}';
+	}
+
 	// Social media brand colors
 	$brand_colors = get_theme_mod( 'minimalio_settings_social_brand_colors', 'no' );
 	if ( $brand_colors !== 'yes' ) {
@@ -859,6 +868,35 @@ function oneguy_customize_register( $customizer ) {
 			)
 		);
 	}
+
+	// =========================================================================
+	// Blog Options: Excerpt Word Count
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_blog_excerpt_words', [
+		'default'           => '40',
+		'sanitize_callback' => 'absint',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_blog_excerpt_words',
+			[
+				'label'       => esc_html__( 'Excerpt Word Count', 'oneguy' ),
+				'description' => esc_html__( 'Number of words to show in the blog list excerpt.', 'oneguy' ),
+				'section'     => 'minimalio_blog_options',
+				'settings'    => 'minimalio_settings_blog_excerpt_words',
+				'type'        => 'number',
+				'input_attrs' => [
+					'min'  => 5,
+					'max'  => 100,
+					'step' => 5,
+				],
+			]
+		)
+	);
 
 	// =========================================================================
 	// Blog Options: Text Alignment + Content Width Behavior
@@ -1322,6 +1360,36 @@ function oneguy_customize_register( $customizer ) {
 	}
 }
 add_action( 'customize_register', 'oneguy_customize_register', 20 );
+
+/**
+ * Override parent's Blog Display Type control to add "List" option
+ */
+function oneguy_override_blog_display_type( $customizer ) {
+	$control = $customizer->get_control( 'minimalio_options_blog_type' );
+	if ( $control ) {
+		$control->choices['list'] = esc_html__( 'List', 'oneguy' );
+	}
+}
+add_action( 'customize_register', 'oneguy_override_blog_display_type', 999 );
+
+/**
+ * Swap blog templates to list view when list mode is active
+ */
+function oneguy_blog_list_template( $template ) {
+	if ( get_theme_mod( 'minimalio_settings_blog_type' ) !== 'list' ) {
+		return $template;
+	}
+
+	if ( is_home() || is_category() || is_tag() || is_author() || is_date() || is_page_template( 'templates/pages/blog-template.php' ) ) {
+		$list_template = get_stylesheet_directory() . '/templates/pages/blog-list-page.php';
+		if ( file_exists( $list_template ) ) {
+			return $list_template;
+		}
+	}
+
+	return $template;
+}
+add_filter( 'template_include', 'oneguy_blog_list_template', 99 );
 
 /**
  * Reposition brand colors control after plugin controls have been registered

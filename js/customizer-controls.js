@@ -84,6 +84,32 @@
 			});
 		});
 
+		// Hide card-related blog controls when display type is "list"
+		wp.customize('minimalio_settings_blog_type', function (setting) {
+			var cardControls = [
+				'minimalio_options_blog_post_card',
+				'minimalio_options_blog_post_card_image_aspect_ratio',
+				'minimalio_options_blog_gap',
+				'minimalio_options_blog_hover_color',
+				'minimalio_options_blog_columns'
+			];
+
+			cardControls.forEach(function (controlId) {
+				wp.customize.control(controlId, function (control) {
+					var visibility = function () {
+						if ('list' === setting.get()) {
+							control.container.slideUp(180);
+						} else {
+							control.container.slideDown(180);
+						}
+					};
+
+					visibility();
+					setting.bind(visibility);
+				});
+			});
+		});
+
 		// Disable divider options in the extra text font dropdown
 		wp.customize.control('minimalio_header_options_header_extra_text_font', function (control) {
 			control.container.find('select option').each(function () {
