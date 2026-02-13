@@ -418,16 +418,32 @@ function oneguy_portfolio_heart_overlay( $html, $post_id, $post_thumbnail_id, $s
 	$heart_html = sprintf(
 		'<button class="oneguy-heart-btn" data-post-id="%d" style="position: absolute; bottom: 16px; %s z-index: 10; background: rgba(0,0,0,0.5); border: none; border-radius: 50px; padding: 8px 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #fff; font-size: 14px; line-height: 1; transition: all 0.2s ease;" aria-label="Like this portfolio item">'
 		. '<svg class="oneguy-heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: all 0.2s ease;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>'
-		. '<span class="oneguy-heart-count">%d</span>'
+		. '<span class="oneguy-heart-count">%s</span>'
 		. '</button>',
 		esc_attr( $post_id ),
 		$pos_style,
-		$count
+		oneguy_format_heart_count( $count )
 	);
 
 	return '<div class="oneguy-heart-wrapper" style="position: relative; display: inline-block; width: 100%;">' . $html . $heart_html . '</div>';
 }
 add_filter( 'post_thumbnail_html', 'oneguy_portfolio_heart_overlay', 10, 5 );
+
+/**
+ * Format heart count: 1000 → 1k, 1500 → 1.5k, etc.
+ */
+function oneguy_format_heart_count( $count ) {
+	$count = absint( $count );
+	if ( $count >= 1000000 ) {
+		$m = $count / 1000000;
+		return rtrim( rtrim( number_format( $m, 1 ), '0' ), '.' ) . 'M';
+	}
+	if ( $count >= 1000 ) {
+		$k = $count / 1000;
+		return rtrim( rtrim( number_format( $k, 1 ), '0' ), '.' ) . 'k';
+	}
+	return (string) $count;
+}
 
 /**
  * Generate heart button HTML for non-image positions (after-title, after-meta)
@@ -438,12 +454,71 @@ function oneguy_get_heart_button_html( $post_id ) {
 	return sprintf(
 		'<span class="oneguy-heart-btn flex mb-2 lg:mb-0 lg:mr-2" data-post-id="%d" style="cursor: pointer; align-items: center; gap: 4px; transition: all 0.2s ease;" aria-label="Like this portfolio item">'
 		. '<svg class="oneguy-heart-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: all 0.2s ease; vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>'
-		. '<span class="oneguy-heart-count">%d</span>'
+		. '<span class="oneguy-heart-count">%s</span>'
 		. '</span>',
 		esc_attr( $post_id ),
-		$count
+		oneguy_format_heart_count( $count )
 	);
 }
+
+/**
+ * Inject heart counts into portfolio archive/grid cards via footer script
+ */
+function oneguy_portfolio_archive_hearts() {
+	if ( get_theme_mod( 'minimalio_settings_portfolio_heart_enable', 'no' ) !== 'yes' ) {
+		return;
+	}
+	// Skip single portfolio pages (heart is handled by the overlay/meta there)
+	if ( is_singular( 'portfolio' ) ) {
+		return;
+	}
+
+	// Query all portfolio posts to get heart counts
+	$portfolio_posts = get_posts( [
+		'post_type'      => 'portfolio',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+	] );
+
+	$hearts = [];
+	foreach ( $portfolio_posts as $pid ) {
+		$hearts[ $pid ] = absint( get_post_meta( $pid, '_oneguy_heart_count', true ) );
+	}
+	?>
+	<script>
+	(function() {
+		var hearts = <?php echo wp_json_encode( $hearts ); ?>;
+		function fmtCount(n) {
+			if (n >= 1000000) { var m = (n / 1000000).toFixed(1); return parseFloat(m) + 'M'; }
+			if (n >= 1000) { var k = (n / 1000).toFixed(1); return parseFloat(k) + 'k'; }
+			return String(n);
+		}
+		document.addEventListener('DOMContentLoaded', function() {
+			var cards = document.querySelectorAll('.post-card[data-card-id]');
+			cards.forEach(function(card) {
+				var id = card.getAttribute('data-card-id');
+				if (!hearts.hasOwnProperty(id)) return;
+				var heading = card.querySelector('.post-card__heading');
+				if (!heading) return;
+				heading.style.display = 'flex';
+				heading.style.alignItems = 'center';
+				heading.style.justifyContent = 'space-between';
+				heading.style.gap = '8px';
+				heading.style.paddingBottom = '0';
+				heading.style.marginBottom = '2px';
+				var heart = document.createElement('span');
+				heart.className = 'oneguy-archive-heart';
+				heart.style.cssText = 'display: inline-flex; align-items: center; gap: 4px; font-size: 13px; opacity: 0.7; white-space: nowrap; flex-shrink: 0;';
+				heart.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (hearts[id] > 0 ? '#e74c3c' : 'none') + '" stroke="' + (hearts[id] > 0 ? '#e74c3c' : 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>'
+					+ '<span>' + fmtCount(hearts[id]) + '</span>';
+				heading.appendChild(heart);
+			});
+		});
+	})();
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'oneguy_portfolio_archive_hearts' );
 
 /**
  * Add additional dynamic CSS for child theme customizer options

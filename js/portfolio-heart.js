@@ -14,6 +14,18 @@
 		var busy = false;
 		var isOverlay = oneguyHeart.position === 'bottom-left' || oneguyHeart.position === 'bottom-right';
 
+		function formatCount(n) {
+			if (n >= 1000000) {
+				var m = (n / 1000000).toFixed(1);
+				return parseFloat(m) + 'M';
+			}
+			if (n >= 1000) {
+				var k = (n / 1000).toFixed(1);
+				return parseFloat(k) + 'k';
+			}
+			return String(n);
+		}
+
 		function setLiked() {
 			icon.setAttribute('fill', '#e74c3c');
 			icon.setAttribute('stroke', '#e74c3c');
@@ -46,7 +58,7 @@
 					try {
 						var res = JSON.parse(xhr.responseText);
 						if (res.success) {
-							countEl.textContent = res.data.count;
+							countEl.textContent = formatCount(res.data.count);
 							if (res.data.liked) {
 								setLiked();
 							} else {
