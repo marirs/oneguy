@@ -146,34 +146,71 @@ $search         = $wp_query;
 				</h1>
 			<?php endif; ?>
 
+			<?php
+			$list_style    = get_theme_mod( 'minimalio_settings_blog_list_style', 'style_1' );
+			$excerpt_words = get_theme_mod( 'minimalio_settings_blog_excerpt_words', 40 );
+			?>
+
 			<?php if ( $search->have_posts() ) : ?>
 
 				<?php while ( $search->have_posts() ) : $search->the_post(); ?>
-					<table class="blog-list__row" style="width: 100%; table-layout: fixed; border-collapse: collapse; border: none; margin-bottom: 0.5rem;">
-						<tr>
+
+					<?php if ( $list_style === 'style_2' ) : ?>
+
+						<article class="blog-list__item blog-list__style-2" style="margin-bottom: 3.5rem; max-width: 1000px;">
 							<?php if ( has_post_thumbnail() ) : ?>
-							<td style="width: 170px; padding: 0.75rem 1rem 0.75rem 0; vertical-align: top; border: none;">
-								<a href="<?php the_permalink(); ?>">
-									<?php the_post_thumbnail( 'medium', [ 'style' => 'width: 170px; height: 170px; object-fit: cover; display: block;' ] ); ?>
+								<a href="<?php the_permalink(); ?>" style="display: block; margin-bottom: 1rem; overflow: hidden; max-width: 75%;">
+									<?php the_post_thumbnail( 'large', [ 'style' => 'width: 100%; height: 300px; object-fit: cover; display: block;' ] ); ?>
 								</a>
-							</td>
 							<?php endif; ?>
-							<td style="padding: 0.75rem 0; vertical-align: top; border: none;">
-								<h2 class="blog-list__title" style="margin: 0 0 0.2rem 0; font-size: 21px; font-weight: 700; line-height: 1.35;">
-									<a href="<?php the_permalink(); ?>" style="text-decoration: none; color: inherit;"><?php the_title(); ?></a>
-								</h2>
-								<div class="blog-list__date" style="margin-bottom: 0.4rem; opacity: 0.5;">
-									<?php echo get_the_date(); ?>
-								</div>
-								<div class="blog-list__excerpt">
-									<?php
-									$excerpt_words = get_theme_mod( 'minimalio_settings_blog_excerpt_words', 40 );
-									echo wp_trim_words( get_the_excerpt(), $excerpt_words, '...' );
-									?>
-								</div>
-							</td>
-						</tr>
-					</table>
+							<table class="blog-list__style-2-row" style="width: 100%; max-width: 1000px; table-layout: fixed; border-collapse: collapse; border: none;">
+								<tr>
+									<td style="width: 22%; padding: 0 0.5rem 0 0; vertical-align: top; border: none;">
+										<h2 class="blog-list__title" style="margin: 0; font-size: 18px; font-weight: 700; line-height: 1.35;">
+											<a href="<?php the_permalink(); ?>" style="text-decoration: none; color: inherit;"><?php the_title(); ?></a>
+										</h2>
+									</td>
+									<td style="width: 53%; padding: 0 0.5rem; vertical-align: top; border: none;">
+										<div class="blog-list__excerpt" style="line-height: 1.6;">
+											<?php echo wp_trim_words( get_the_excerpt(), $excerpt_words, '...' ); ?>
+										</div>
+									</td>
+									<td style="width: 25%; padding: 0 0 0 0.5rem; vertical-align: top; border: none; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6;">
+										<div style="margin-bottom: 0.25rem;"><?php echo get_the_date( 'F j, Y' ); ?></div>
+										<div style="margin-bottom: 0.25rem;"><?php the_author(); ?></div>
+										<div><?php comments_number( __( 'No Comments', 'oneguy' ), __( '1 Comment', 'oneguy' ), __( '% Comments', 'oneguy' ) ); ?></div>
+									</td>
+								</tr>
+							</table>
+						</article>
+
+					<?php else : ?>
+
+						<table class="blog-list__row" style="width: 100%; table-layout: fixed; border-collapse: collapse; border: none; margin-bottom: 0.5rem;">
+							<tr>
+								<?php if ( has_post_thumbnail() ) : ?>
+								<td style="width: 170px; padding: 0.75rem 1rem 0.75rem 0; vertical-align: top; border: none;">
+									<a href="<?php the_permalink(); ?>">
+										<?php the_post_thumbnail( 'medium', [ 'style' => 'width: 170px; height: 170px; object-fit: cover; display: block;' ] ); ?>
+									</a>
+								</td>
+								<?php endif; ?>
+								<td style="padding: 0.75rem 0; vertical-align: top; border: none;">
+									<h2 class="blog-list__title" style="margin: 0 0 0.2rem 0; font-size: 21px; font-weight: 700; line-height: 1.35;">
+										<a href="<?php the_permalink(); ?>" style="text-decoration: none; color: inherit;"><?php the_title(); ?></a>
+									</h2>
+									<div class="blog-list__date" style="margin-bottom: 0.4rem; opacity: 0.5;">
+										<?php echo get_the_date(); ?>
+									</div>
+									<div class="blog-list__excerpt">
+										<?php echo wp_trim_words( get_the_excerpt(), $excerpt_words, '...' ); ?>
+									</div>
+								</td>
+							</tr>
+						</table>
+
+					<?php endif; ?>
+
 				<?php endwhile; ?>
 
 			<?php else : ?>

@@ -46,6 +46,15 @@
   opacity: 0.7;
 }
 
+/* Style 2 — Editorial */
+.blog-list-view .blog-list__style-2 table {
+  border: none !important;
+}
+
+.blog-list-view .blog-list__style-2 td {
+  border: none !important;
+}
+
 @media (max-width: 480px) {
   .blog-list-view .blog-list__row,
   .blog-list-view .blog-list__row tbody,
@@ -55,6 +64,17 @@
     width: 100% !important;
   }
   .blog-list-view .blog-list__row td {
+    padding: 0.5rem 0 !important;
+  }
+
+  .blog-list-view .blog-list__style-2 table,
+  .blog-list-view .blog-list__style-2 tbody,
+  .blog-list-view .blog-list__style-2 tr,
+  .blog-list-view .blog-list__style-2 td {
+    display: block !important;
+    width: 100% !important;
+  }
+  .blog-list-view .blog-list__style-2 td {
     padding: 0.5rem 0 !important;
   }
 }

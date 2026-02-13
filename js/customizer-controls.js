@@ -84,7 +84,19 @@
 			});
 		});
 
+		// Reorder: move List Style and Excerpt Word Count right after Blog Display Type
+		wp.customize.control('minimalio_options_blog_type', function (blogTypeControl) {
+			wp.customize.control('minimalio_options_blog_list_style', function (listStyleControl) {
+				listStyleControl.container.detach().insertAfter(blogTypeControl.container);
+
+				wp.customize.control('minimalio_options_blog_excerpt_words', function (excerptControl) {
+					excerptControl.container.detach().insertAfter(listStyleControl.container);
+				});
+			});
+		});
+
 		// Hide card-related blog controls when display type is "list"
+		// Show list-specific controls only when display type is "list"
 		wp.customize('minimalio_settings_blog_type', function (setting) {
 			var cardControls = [
 				'minimalio_options_blog_post_card',
@@ -94,6 +106,11 @@
 				'minimalio_options_blog_columns'
 			];
 
+			var listControls = [
+				'minimalio_options_blog_list_style',
+				'minimalio_options_blog_excerpt_words'
+			];
+
 			cardControls.forEach(function (controlId) {
 				wp.customize.control(controlId, function (control) {
 					var visibility = function () {
@@ -101,6 +118,21 @@
 							control.container.slideUp(180);
 						} else {
 							control.container.slideDown(180);
+						}
+					};
+
+					visibility();
+					setting.bind(visibility);
+				});
+			});
+
+			listControls.forEach(function (controlId) {
+				wp.customize.control(controlId, function (control) {
+					var visibility = function () {
+						if ('list' === setting.get()) {
+							control.container.slideDown(180);
+						} else {
+							control.container.slideUp(180);
 						}
 					};
 

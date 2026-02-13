@@ -481,6 +481,10 @@ function oneguy_dynamic_css() {
 			max-width: 1000px !important;
 			table-layout: fixed !important;
 		}';
+		$css .= '.blog-list-view .blog-list__style-2-row {
+			max-width: 1500px !important;
+			table-layout: fixed !important;
+		}';
 	}
 
 	// Social media brand colors
@@ -893,6 +897,34 @@ function oneguy_customize_register( $customizer ) {
 					'min'  => 5,
 					'max'  => 100,
 					'step' => 5,
+				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Blog Options: List Style (only visible when List is selected)
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_blog_list_style', [
+		'default'           => 'style_1',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_blog_list_style',
+			[
+				'label'       => esc_html__( 'Blog List Style', 'oneguy' ),
+				'description' => esc_html__( 'Style 1: Thumbnail + Title/Excerpt. Style 2: Large image + Title/Excerpt/Meta columns.', 'oneguy' ),
+				'section'     => 'minimalio_blog_options',
+				'settings'    => 'minimalio_settings_blog_list_style',
+				'type'        => 'select',
+				'choices'     => [
+					'style_1' => esc_html__( 'Style 1 — Compact', 'oneguy' ),
+					'style_2' => esc_html__( 'Style 2 — Editorial', 'oneguy' ),
 				],
 			]
 		)
