@@ -67,5 +67,29 @@
 		btn.addEventListener('click', function () {
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 		});
+
+		// =====================================================================
+		// 3. Disable right-click on portfolio images
+		// =====================================================================
+
+		if (typeof oneguySettings !== 'undefined' && oneguySettings.protectImages === '1') {
+			document.addEventListener('contextmenu', function (e) {
+				var el = e.target;
+				if (el.tagName === 'IMG'
+					|| el.closest('img, picture, figure, .post-card__image, .post-card__overlay, .post-card, .post-item')) {
+					e.preventDefault();
+				}
+			});
+
+			document.addEventListener('dragstart', function (e) {
+				if (e.target.tagName === 'IMG') {
+					e.preventDefault();
+				}
+			});
+
+			var css = document.createElement('style');
+			css.textContent = 'img{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;pointer-events:auto;}';
+			document.head.appendChild(css);
+		}
 	});
 })();

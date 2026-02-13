@@ -22,6 +22,10 @@ function oneguy_enqueue_styles() {
 		wp_get_theme()->get( 'Version' ),
 		true
 	);
+
+	wp_localize_script( 'oneguy-enhancements', 'oneguySettings', [
+		'protectImages' => get_theme_mod( 'minimalio_settings_protect_images', 'no' ) === 'yes' ? '1' : '0',
+	] );
 }
 add_action( 'wp_enqueue_scripts', 'oneguy_enqueue_styles' );
 
@@ -1656,6 +1660,34 @@ function oneguy_customize_register( $customizer ) {
 				'choices'     => [
 					'no'  => esc_html__( 'No (Inherit Text Color)', 'oneguy' ),
 					'yes' => esc_html__( 'Yes (Brand Colors)', 'oneguy' ),
+				],
+			]
+		)
+	);
+
+	// =========================================================================
+	// Page Options: Image Protection
+	// =========================================================================
+
+	$customizer->add_setting( 'minimalio_settings_protect_images', [
+		'default'           => 'no',
+		'sanitize_callback' => 'sanitize_text_field',
+		'transport'         => 'refresh',
+	]);
+
+	$customizer->add_control(
+		new WP_Customize_Control(
+			$customizer,
+			'minimalio_options_protect_images',
+			[
+				'label'       => esc_html__( 'Protect Images (Disable Right-Click)', 'oneguy' ),
+				'description' => esc_html__( 'Prevents right-click context menu and drag on all images site-wide. Note: this is a deterrent, not absolute protection.', 'oneguy' ),
+				'section'     => 'minimalio_page_options',
+				'settings'    => 'minimalio_settings_protect_images',
+				'type'        => 'select',
+				'choices'     => [
+					'no'  => esc_html__( 'No', 'oneguy' ),
+					'yes' => esc_html__( 'Yes', 'oneguy' ),
 				],
 			]
 		)
