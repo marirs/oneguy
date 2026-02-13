@@ -117,9 +117,30 @@ Both styles share these behaviors:
 | **Content Width Behavior** | `Full` or `Constrained` for portfolio single pages. |
 | **Portfolio Title Color** | Color for portfolio titles on the archive/grid page. |
 | **Single Portfolio Title Color** | Color for the title on single portfolio pages. |
+| **Enable Heart/Like** | Show a heart icon with like count on portfolio pages. One like per IP address. |
+| **Heart Position** | Where to display the heart: **Image — Bottom Right**, **Image — Bottom Left**, or **After Post Meta** (inline). |
 | **Show Comments** | Enable or disable comments on portfolio posts. |
 | **Comments Title Color** | Color for the "Leave a Reply" heading. |
 | **Comments Reply Color** | Color for the "Comments" heading. |
+
+#### Heart/Like Feature
+
+When **Enable Heart/Like** is set to "Yes":
+
+- A heart icon with like count appears on **single portfolio pages** at the chosen position.
+- Heart + count also appears on the **portfolio archive/grid page**, right-aligned next to each title.
+- **One like per IP address** — clicking again unlikes (toggles).
+- Liked state: **filled red heart**. Unliked: **outline heart**.
+- Counts are formatted using industry standard abbreviations: `1.2k`, `15k`, `1.5M`.
+- Data stored in post meta (`_oneguy_heart_count` + `_oneguy_heart_ips`).
+
+**Position options:**
+
+| Position | Behavior |
+|---|---|
+| **Image — Bottom Right** | Pill-shaped overlay on the featured image, bottom-right corner (dark background, white icon). |
+| **Image — Bottom Left** | Same overlay style, bottom-left corner. |
+| **After Post Meta** | Inline in the meta row with `\|` separators: `By: admin \| Feb 12, 2026 \| ♥ 1.2k \| Share: ...` |
 
 ---
 
@@ -149,7 +170,8 @@ oneguy/
 │   └── unified-font-upload.php ← Font upload admin page
 ├── js/
 │   ├── customizer-controls.js  ← Customizer UI logic (visibility toggles, font dropdown)
-│   └── content-width.js        ← Gutenberg constrained width override
+│   ├── content-width.js        ← Gutenberg constrained width override
+│   └── portfolio-heart.js      ← Heart/Like click handler + AJAX
 └── templates/
     ├── blocks/
     │   └── blog-list.php       ← Blog list display template
